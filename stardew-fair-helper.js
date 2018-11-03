@@ -18,16 +18,6 @@ window.onload = function () {
 	$('#input-container').show();
 
 	// Utility functions
-	function addCommas(x) {
-		// Jamie Taylor @ https://stackoverflow.com/questions/3883342/add-commas-to-a-number-in-jquery
-		return x.toString().replace(/\B(?=(?:\d{3})+(?!\d))/g, ",");
-	}
-
-	function capitalize(s) {
-		// joelvh @ https://stackoverflow.com/questions/1026069/how-do-i-make-the-first-letter-of-a-string-uppercase-in-javascript
-		return s && s[0].toUpperCase() + s.slice(1);
-	}
-
 	function htmlDecode(s) {
 		// Wladimir Palant @ https://stackoverflow.com/questions/1912501/unescape-html-entities-in-javascript
 		var doc = new DOMParser().parseFromString(s, "text/html");
@@ -43,11 +33,6 @@ window.onload = function () {
 					('<a href="http://stardewvalleywiki.com/' + trimmed + '">' + item + '</a>');
 	}
 
-	function wikimap(item, index, arr) {
-		// Wrapper to allow wikify to be used within an array map without misinterpreting the 2nd and 3rd arguments.
-		return wikify(item);
-	}
-	
 	function isValidFarmhand(player) {
 		// Currently using a blank userID field to determine that a farmhand slot is empty
 		if ($(player).children('userID').text() === '') {
@@ -61,8 +46,7 @@ window.onload = function () {
 	// Must be writable: true, enumerable: false, configurable: true
 		Object.defineProperty(Object, "assign", {
 			value: function assign(target, varArgs) { // .length of function is 2
-				'use strict';
-				if (target == null) { // TypeError if undefined or null
+				if (target === null) { // TypeError if undefined or null
 					throw new TypeError('Cannot convert undefined or null to object');
 				}
 
@@ -71,7 +55,7 @@ window.onload = function () {
 			for (var index = 1; index < arguments.length; index++) {
 				var nextSource = arguments[index];
 
-				if (nextSource != null) { // Skip over if undefined or null
+				if (nextSource !== null) { // Skip over if undefined or null
 					for (var nextKey in nextSource) {
 						// Avoid bugs when hasOwnProperty is shadowed
 						if (Object.prototype.hasOwnProperty.call(nextSource, nextKey)) {
@@ -97,10 +81,9 @@ window.onload = function () {
 	}
 	
 	// Save parsing will set all the form fields and then refresh the calculation when done.
-	function parseFile(xmlDoc, progress) {
+	function parseFile(xmlDoc) {
 		var max_cat = [],
 			extra = [],
-			farmhands = [],
 			container,
 			loc,
 			blank_item = { id:'none', name:'(No Item)', price:0, qual:0, stack: 0, pts: 0,
@@ -160,21 +143,26 @@ window.onload = function () {
 				if (loser.pts > extra[j].pts) {
 					extra.splice(j, 0, loser);
 					extra.pop();
-					break;
+					if (loser.stack > 1) {
+						loser.stack--;
+						continue;
+					} else {
+						break;
+					}
 				}
 			}
 		}
 		
-		function parseObject() {
+		function parseObject(index, e) {
 			// the .each() handler
 			var o = Object.assign({}, blank_item);
-			o.name = $(this).find('name').html();
-			o.price = Number($(this).find('price').text());
-			o.id = Number($(this).find('parentSheetIndex').text());
-			o.real_cat = Number($(this).find('category').text());
+			o.name = $(e).find('name').html();
+			o.price = Number($(e).find('price').text());
+			o.id = Number($(e).find('parentSheetIndex').text());
+			o.real_cat = Number($(e).find('category').text());
 			if (cat_translate.hasOwnProperty(o.real_cat)) { o.fair_cat = cat_translate[o.real_cat]; }
-			o.qual = Number($(this).find('quality').text());
-			o.stack = Number($(this).find('Stack').text());
+			o.qual = Number($(e).find('quality').text());
+			o.stack = Number($(e).find('Stack').text());
 			o.loc = loc;
 			o.pts = calculateItemScore(o);
 			sortItem(o);
@@ -318,7 +306,7 @@ window.onload = function () {
 		//$('#output-container').hide();
 		$('#progress-container').show();
 		//$('#changelog').hide();
-		reader.onloadstart = function (e) {
+		reader.onloadstart = function () {
 			prog.value = 20;
 		};
 		reader.onprogress = function (e) {
@@ -408,22 +396,22 @@ window.onload = function () {
 		// Enforcing prereqs
 		if ($(t).val() === 'Fisher' && $(t).prop('checked') === false) {
 			$('input[name="perk_8"]').prop('checked', false);
-			perk["Angler"] = false;
+			perk.Angler = false;
 		} else if ($(t).val() === 'Angler' && $(t).prop('checked') === true) {
 			$('input[name="perk_6"]').prop('checked', true);
-			perk["Fisher"] = true;
+			perk.Fisher = true;
 		} else if  ($(t).val() === 'Forester' && $(t).prop('checked') === false) {
 			$('input[name="perk_15"]').prop('checked', false);
-			perk["Tapper"] = false;
+			perk.Tapper = false;
 		} else if  ($(t).val() === 'Tapper' && $(t).prop('checked') === true) {
 			$('input[name="perk_12"]').prop('checked', true);
-			perk["Forester"] = true;
+			perk.Forester = true;
 		} else if  ($(t).val() === 'Tiller' && $(t).prop('checked') === false) {
 			$('input[name="perk_4"]').prop('checked', false);
-			perk["Artisan"] = false;
+			perk.Artisan = false;
 		} else if  ($(t).val() === 'Artisan' && $(t).prop('checked') === true) {
 			$('input[name="perk_1"]').prop('checked', true);
-			perk["Tiller"] = true;
+			perk.Tiller = true;
 		} 
 		calculateScore(true);
 	}
