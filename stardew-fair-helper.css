@@ -1,0 +1,174 @@
+/* stardew-checkup.css
+ * https://mouseypounds.github.io/stardew-checkup/
+ */
+
+html {
+	min-height: 100%;
+	background-attachment: fixed;
+	background-color: #80a0f0; /* fallback color if gradients are not supported */
+	background-image: -webkit-linear-gradient(top, #80a0f0, #c0ffff, #40c040); /* For Chrome 25 and Safari 6, iOS 6.1, Android 4.3 */
+	background-image:    -moz-linear-gradient(top, #80a0f0, #c0ffff, #40c040); /* For Firefox (3.6 to 15) */
+	background-image:      -o-linear-gradient(top, #80a0f0, #c0ffff, #40c040); /* For old Opera (11.1 to 12.0) */ 
+	background-image:         linear-gradient(to bottom, #80a0f0, #c0ffff, #40c040); /* Standard syntax; must be last */
+}
+body {
+	margin: 15px;
+	color: #603000;
+}
+a:link, a:visited { color: #804000; }
+a:hover { color: #d08000; }
+a:active { color: #ffa000; }
+h3 {
+	margin: 20px 0 4px;
+}
+.panel {
+	background-color: #ffe0b0;
+	padding: .5em 2em .5em 1em;
+	margin: 5px;
+	border: 5px solid #804000;
+	border-radius: 15px;
+}
+#header {
+	padding-right: 5em;
+}
+#footer {
+	text-align: center;
+	padding-right: 1em;
+	margin-bottom: 3em;
+}
+#input-container { display: none; }
+#progress-container { display: none; }
+.initial_hide { display: none; }
+.error {
+	font-weight: bold;
+	font-size: 150%;
+	color: #ff0000;
+}
+.path {
+	font-family: monospace;
+}
+.ach,.warn,.note {
+	font-style: italic;
+}
+.pts {
+	font-weight: bold;
+}
+.ach_yes,.ms_yes,.pt_yes {
+	color: #004000;
+}
+.ach_yes:before,.ms_yes:before {
+	content: "\2714 ";
+	margin-right: 3px;
+}
+.ach_no,.ms_no,.pt_no {
+	color: #c00000;
+}
+.ach_no:before,.ach_imp:before,.ms_no:before,.ms_imp:before {
+	content: "\2718 ";
+	margin-right: 3px;
+}
+.ach_imp,.ms_imp,.pt_imp {
+	color: #888;
+}
+.ach_list {
+	list-style: none;
+	padding-left: 50px;
+	margin-top: 0px;
+	margin-bottom: 4px;
+	text-indent: -15px;
+}
+.result:before {
+	content: "\25c8 ";
+	margin-right: 3px;
+}
+.result {
+	padding-left: 15px;
+}
+.need:before,.warn:before {
+	content: "! ";
+	font-weight: bold;
+	margin-right: 3px;
+}
+.need {
+	margin-left: 38px;
+}
+.need > ul, .need > ol {
+	margin-left: 3.5em;
+	margin-top: 0px;
+}
+.need ol, .need ul {
+	padding-left: 1.5em;
+}
+ol.outer, ul.outer {
+	margin-top: 0;
+	padding-left: 3em;
+}
+ol.compact, ul.compact {
+	margin-top: 0;
+	padding-left: 1em;
+}
+#checkbox_div {
+	display: inline-block;
+	width: 12em;
+}
+#item_entry {
+	display: inline-block;
+	vertical-align: top;
+}
+.checkboxes {
+	width: 10em;
+	margin-bottom: 10px;
+}
+.form_header {
+	margin-top: 0;
+}
+h2 {
+	margin-top: 5px;
+	margin-bottom: 5px;
+}
+select.quality {
+	width: 7em;
+}
+.category {
+	width: 7em;
+}
+select.item {
+	width: 15em;
+}
+.location {
+	width: 30em;
+}
+input.number, .item_pts {
+	width: 2.5em;
+}
+input[type=text] {
+	height: 24px;
+	padding: 0px 2px;
+	vertical-align: -2px;
+}
+table.output {
+	border: 2px solid black;
+	background-color: white;
+	border-collapse: collapse;
+}
+th, td {
+	border: 1px solid black;
+	text-align: center;
+}
+th {
+	color: white;
+	background-color: #333;
+}
+th.total {
+	color: black;
+	background-color: #aaa;
+}
+td {
+	color: black;
+}
+th.details {
+	width: 20em;
+}
+th.score {
+	width: 4em;
+}

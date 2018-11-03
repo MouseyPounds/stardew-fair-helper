@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Stardew Fair Helper</title>
+<meta charset="UTF-8" />
+
+<link rel="stylesheet" type="text/css" href="./stardew-fair-helper.css" />
+<link rel="stylesheet" type="text/css" href="./select2.css" />
+<link rel="icon" type="image/png" href="./favicon_f.png" />
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script>window.jQuery || document.write('<script src="./jquery-3.2.1.min.js"><\/script>')</script>
+<script src="./select2.min.js"></script>
+<script src="./stardew-fair-helper.js"></script>
+
+</head>
+<body>
+<div id="header" class="panel">
+<h1>Stardew Fair Helper</h1>
+<h2 id="sec_about">About</h2>
+<p>This app helps to prepare for the Grange Display at the Fall Festival in <a href="http://stardewvalley.net/">Stardew Valley</a>. It will calculate the score for manually-entered items and also search through a save file to recommend which item combination would give the highest possible score. Please report any bugs, suggestions, or other feedback to <a href="https://community.playstarbound.com/threads/webapp-stardew-checkup-achievement-completion-progress.141706/">the topic in the official forums.</a> (TODO: Fix URL to actual topic once it is created)</p>
+<p>The app is written in Javascript and uses <a href="https://jquery.com/">jQuery</a> and <a href="https://select2.org/">Select2</a>; it is hosted on GitHub Pages at <a href="https://mouseypounds.github.io/stardew-fair-helper/">https://mouseypounds.github.io/stardew-fair-helper/</a> and the source code repository is <a href="https://github.com/MouseyPounds/stardew-fair-helper">https://github.com/MouseyPounds/stardew-fair-helper</a>.</p>
+</div>
+
+<div id="input-container" class="panel">
+<h2 id="sec_save_file">Save File</h2>
+<p>If you would like the app to scan a save file in order to recommend what items to use for the display, you can select the save file below: <br />
+<input type="file" id="file_select" /></p>
+<p>Please use the full save file named with your farmer's name and a 9-digit ID number (e.g. <span class="path">Fred_148093307</span>); do not use the <span class="path">SaveGameInfo</span> file as it does not contain all the necessary information.
+<p>Default save file locations are:
+<ul><li>Windows: <span class="path">%AppData%\StardewValley\Saves\</span></li>
+<li>Mac OSX &amp; Linux: <span class="path">~/.config/StardewValley/Saves/</span></li>
+</ul>
+</div>
+
+<div id="progress-container" class="panel">
+<h2 id="sec_working">Working...</h2>
+<progress id="progress" value="0" max="100"></progress>
+</div>
+
+<div id="form-container" class="panel">
+<h2 id="sec_form">Item Input</h2>
+<p>This section will be filled in automatically when loading a save. It can also be edited manually to experiment with
+other options or to use the app without loading a save. When analyzing a multiplayer save, it is assumed that all
+players are online and so all players' professions are included. Note that you cannot select the Lucky Purple Shorts
+as a choice and the app will not suggest it either since it has a fixed special result.</p>
+<div id="checkbox_div">
+<h3 class="form_header">Farm Settings</h3>
+<fieldset id="profit_margin_set" class="checkboxes">
+<legend>Profit Margin</legend>
+<input type="text" id="profit_margin" name="profit_margin" value="1.00" class="number"> (Enter as decimal)
+</fieldset>
+<br />
+<h3 class="form_header">Farmer Perks</h3>
+<fieldset id="perks_farming" class="checkboxes">
+<legend>Farming</legend>
+<input type="checkbox" name="perk_0" value="Rancher" class="perk"><label for="Rancher"> Rancher (Lvl 5)</label><br />
+<input type="checkbox" name="perk_1" value="Tiller" class="perk"><label for="Tiller"> Tiller (Lvl 5)</label><br />
+<input type="checkbox" name="perk_4" value="Artisan" class="perk"><label for="Artisan"> Artisan (Lvl 10)</label>
+</fieldset>
+<fieldset id="perks_fishing" class="checkboxes">
+<legend>Fishing</legend>
+<input type="checkbox" name="perk_6" value="Fisher" class="perk"><label for="Fisher"> Fisher (Lvl 5)</label><br />
+<input type="checkbox" name="perk_8" value="Angler" class="perk"><label for="Angler"> Angler (Lvl 10)</label>
+</fieldset>
+<fieldset id="perks_foraging" class="checkboxes">
+<legend>Foraging</legend>
+<input type="checkbox" name="perk_12" value="Forester" class="perk"><label for="Forester"> Forester (Lvl 5)</label><br />
+<input type="checkbox" name="perk_15" value="Tapper" class="perk"><label for="Tapper"> Tapper (Lvl 10)</label>
+</fieldset>
+<fieldset id="perks_mining" class="checkboxes">
+<legend>Mining</legend>
+<input type="checkbox" name="perk_20" value="Blacksmith" class="perk"><label for="Blacksmith"> Blacksmith (Lvl 10)</label><br />
+<input type="checkbox" name="perk_23" value="Gemologist" class="perk"><label for="Gemologist"> Gemologist (Lvl 10)</label>
+</fieldset>
+<fieldset id="perks_event" class="checkboxes">
+<legend>Special Event Perks</legend>
+<input type="checkbox" name="event_2120303" value="BearsKnowledge" class="perk"><label for="BearsKnowledge"> Bear's Knowledge</label><br />
+<input type="checkbox" name="event_3910979" value="SpringOnionMastery" class="perk"><label for="SpringOnionMastery"> Spring Onion Mastery</label>
+</fieldset>
+</div>
+<div id="item_entry">
+</div>
+</div>
+
+<div id="output-container" class="panel">
+<h2 id="sec_results">Expected Score</h2>
+<div id="out">Load a save or select items with the form above.</div>
+<div id="debug"> </div>
+</div>
+
+<div id="changelog" class="panel">
+<noscript><span class="error">Javascript appears to be unsupported by or disabled in your browser. Stardew Fair Helper will not work without it.</span></noscript>
+<h2 id="sec_changelog">Changelog</h2>
+<ul>
+<li>?? ???  2018 - v0.1.0 - Initial release</li>
+</ul>
+</div>
+
+<div id="footer" class="panel">
+Stardew Apps by MouseyPounds: <a href="https://mouseypounds.github.io/stardew-checkup/">Stardew Checkup</a> ||
+<a href="https://mouseypounds.github.io/stardew-predictor/">Stardew Predictor</a> || 
+<a href="https://mouseypounds.github.io/stardew-fair-helper//">Stardew Fair Helper</a>
+<br />
+Other Stardew Valley resources: <a href="http://stardewvalley.net/">Website</a> || 
+<a href="http://store.steampowered.com/app/413150/Stardew_Valley/">Steam Page</a> ||
+<a href="https://www.gog.com/game/stardew_valley">GOG Page</a> ||
+<a href="http://www.stardewvalleywiki.com/">Wiki</a> || 
+<a href="http://community.playstarbound.com/index.php?forums/stardew-valley.72/">Forums</a> ||
+<a href="https://www.reddit.com/r/StardewValley">Subreddit</a> ||
+<a href="https://discordapp.com/invite/StardewValley">Discord</a>
+<br />
+Stardew Valley was developed by <a href="http://twitter.com/concernedape">ConcernedApe</a> and published by 
+<a href="http://blog.chucklefish.org/about/">Chucklefish Games</a>.
+</div>
+</body>
+</html>
