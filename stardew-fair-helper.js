@@ -28,6 +28,12 @@ window.onload = function () {
 		return s && s[0].toUpperCase() + s.slice(1);
 	}
 
+	function htmlDecode(s) {
+		// Wladimir Palant @ https://stackoverflow.com/questions/1912501/unescape-html-entities-in-javascript
+		var doc = new DOMParser().parseFromString(s, "text/html");
+		return doc.documentElement.textContent;
+	}
+	
 	function wikify(item, page) {
 		// removing egg colors & changing spaces to underscores
 		var trimmed = item.replace(' (White)', '');
@@ -89,35 +95,9 @@ window.onload = function () {
 		r += '</div>';
 		return r;
 	}
-
-	function sortItem(o, max_cat, extras) {
-		// Item sorting looks to replace the max for this category first
-		// Then merges the loser of that comparison into the extras
-		var loser = Object.assign({}, o);
-		if (o.fair_cat !== 8) {
-			if (o.pts > max_cat[o.fair_cat].pts) {
-				loser = Object.assign({}, max_cat[o.fair_cat]);
-				Object.assign(max_cat[o.fair_cat], o);
-			} else {
-			}
-		}
-		for (var j = 0; j < 9; j++) {
-			if (loser.pts > extras[j].pts) {
-				extras.splice(j, 0, loser);
-				extras.pop();
-				break;
-			}
-		}
-	}
-	
-	function byPoints(a, b) {
-		// sort helper function
-		return b.pts - a.pts;
-	}
 	
 	// Save parsing will set all the form fields and then refresh the calculation when done.
-	// Final count logic: http://jsfiddle.net/5wkvrzxs/9
-	function parseFile(xmlDoc) {
+	function parseFile(xmlDoc, progress) {
 		var max_cat = [],
 			extra = [],
 			farmhands = [],
@@ -130,8 +110,76 @@ window.onload = function () {
 			professions = { 0: "Rancher", 1: "Tiller", 4: "Artisan", 6: "Fisher", 8: "Angler",
 							12: "Forester", 15: "Tapper", 20: "Blacksmith", 23: "Gemologist" },
 			events = { 2120303: "BearsKnowledge", 3910979: "SpringOnionMastery" },
+			packedColor = {
+				4278190080: "Brown",
+				4294923605: "Dark Blue",
+				4294950775: "Light Blue",
+				4289374720: "Dark Blue-Green",
+				4289718784: "Light Blue-Green",
+				4278233600: "Dark Green",
+				4278250655: "Light Green",
+				4279429887: "Yellow",
+				4279412735: "Yellow-Orange",
+				4279396863: "Orange",
+				4278190335: "Red", 
+				4280483975: "Dark Red",
+				4291276287: "Pale Pink",
+				4290999807: "Bright Pink",
+				4291166380: "Magenta",
+				4294901903: "Purple",
+				4287499097: "Dark Purple",
+				4282400832: "Black",
+				4284769380: "Dark Grey",
+				4291348680: "Light Grey",
+				4294901502: "White",
+				},
 			i,
 			n;
+
+		// Debug output; delete later
+		var out = "<h3>Debug Output</h3>";		
+			
+		// Defining helper functions here in order to have access to our object arrays, particularly the jQuery each handler.	
+		function byPoints(a, b) {
+			// sort helper function
+			return b.pts - a.pts || b.price - a.price;
+		}
+
+		function sortItem(o) {
+			// Item sorting looks to replace the max for this category first
+			// Then merges the loser of that comparison into the extras
+			var loser = Object.assign({}, o);
+			if (o.fair_cat !== 8) {
+				if (o.pts > max_cat[o.fair_cat].pts) {
+					loser = Object.assign({}, max_cat[o.fair_cat]);
+					Object.assign(max_cat[o.fair_cat], o);
+				} else {
+				}
+			}
+			for (var j = 0; j < 9; j++) {
+				if (loser.pts > extra[j].pts) {
+					extra.splice(j, 0, loser);
+					extra.pop();
+					break;
+				}
+			}
+		}
+		
+		function parseObject() {
+			// the .each() handler
+			var o = Object.assign({}, blank_item);
+			o.name = $(this).find('name').html();
+			o.price = Number($(this).find('price').text());
+			o.id = Number($(this).find('parentSheetIndex').text());
+			o.real_cat = Number($(this).find('category').text());
+			if (cat_translate.hasOwnProperty(o.real_cat)) { o.fair_cat = cat_translate[o.real_cat]; }
+			o.qual = Number($(this).find('quality').text());
+			o.stack = Number($(this).find('Stack').text());
+			o.loc = loc;
+			o.pts = calculateItemScore(o);
+			sortItem(o);
+			out += printObject(o);
+		}		
 
 		// Perks & Events
 		// First clear any manually-entered values.
@@ -170,7 +218,7 @@ window.onload = function () {
 				}
 			}
 		});
-
+		
 		// Item Search
 		// Initialize max value item for each category & the top 9 "extras"
 		for (i = 0; i < 8 ; i++) {
@@ -179,27 +227,12 @@ window.onload = function () {
 		for (i = 0; i < 10 ; i++) {
 			extra[i] = Object.assign({}, blank_item);
 		}
-		//id = $(xmlDoc).find('player > UniqueMultiplayerID').text();
-		var out = "<h3>Debug Output</h3>";
 
 		// Main player inventory
 		container = $(xmlDoc).find('player');
 		loc = $(container).find('name').html() + "'s Inventory";
 		out += "<h4>" + loc + "</h4>";
-		$(container).find("Item[xsi\\:type='Object']").each(function() {
-			var o = Object.assign({}, blank_item);
-			o.name = $(this).find('name').html();
-			o.price = Number($(this).find('price').text());
-			o.id = Number($(this).find('parentSheetIndex').text());
-			o.real_cat = Number($(this).find('category').text());
-			if (cat_translate.hasOwnProperty(o.real_cat)) { o.fair_cat = cat_translate[o.real_cat]; }
-			o.qual = Number($(this).find('quality').text());
-			o.stack = Number($(this).find('Stack').text());
-			o.loc = loc;
-			o.pts = calculateItemScore(o);
-			sortItem(o, max_cat, extra);
-			out += printObject(o);
-		});
+		$(container).find("Item[xsi\\:type='Object']").each(parseObject);
 		
 		// Farmhand inventories
 		$(xmlDoc).find('farmhand').each(function() {
@@ -207,65 +240,53 @@ window.onload = function () {
 				container = this;
 				loc = $(container).find('name').html() + "'s Inventory";
 				out += "<h4>" + loc + "</h4>";
-				$(container).find("Item[xsi\\:type='Object']").each(function() {
-					var o = Object.assign({}, blank_item);
-					o.name = $(this).find('name').html();
-					o.price = Number($(this).find('price').text());
-					o.id = Number($(this).find('parentSheetIndex').text());
-					o.real_cat = Number($(this).find('category').text());
-					if (cat_translate.hasOwnProperty(o.real_cat)) { o.fair_cat = cat_translate[o.real_cat]; }
-					o.qual = Number($(this).find('quality').text());
-					o.stack = Number($(this).find('Stack').text());
-					o.loc = loc;
-					o.pts = calculateItemScore(o);
-					sortItem(o, max_cat, extra);
-					out += printObject(o);
-				});			
+				$(container).find("Item[xsi\\:type='Object']").each(parseObject);	
 			}
 		});
 		
 		// Chests and other storage
-		//TODO: coordinates and parent location, maybe chest color
 		$(xmlDoc).find('playerChest').each(function() {
+			var locName = $(this).parents("GameLocation").children("name").html(),
+				bldgName = $(this).parents("Building").children("buildingType").html();
 			if ($(this).text() === "true" || $(this).parent().prop("tagName") === 'heldObject') {
-				var name;
+				var name,
+					color;
+				if (typeof(locName) === "undefined") {
+					locName = "";
+				} else {
+					locName = " in " + locName;
+				}
+				if (typeof(bldgName) === "undefined") {
+					bldgName = "";
+				} else {
+					bldgName = " in " + bldgName;
+				}
 				container = $(this).parent();
 				if ($(container).prop("tagName") === 'fridge') {
 					name = "Fridge";
+				} else if ($(container).parent().find("name").html() === "Auto-Grabber") {
+					name = "Auto-Grabber";
+				} else if ($(this).prop("tagName") === 'output') {
+					name = "Output Bin";
 				} else {
 					name = $(container).find("name").html();
-				}
-				loc = name;
-				$(container).parents().each(function() {
-					var tag = $(this).prop("tagName");
-					if (tag === "GameLocation") {
-						tag += "(" + $(this).children("name").html() + ")";
-					} else if (tag === "Building") {
-						//var type = $(this).attr('xsi:type');
-						tag += "(" + $(this).children("buildingType").html() + ")";
+					if (name !== "Chest") {
+						// Named chest, probably from Chests Anywhere mod. Remove special tokens
+						name = name.replace(/\s+\|.+\|/,'');
+						name = "Chest (" + name + ")";
 					}
-					loc += " in &lt;" + tag + "&gt;";
-				});
+					color = $(container).find('playerChoiceColor PackedValue').text();
+					if (packedColor.hasOwnProperty(color)) {
+						name = packedColor[color] + " " + name;
+					}	
+				}
+				loc = name + bldgName + locName;
 				out += "<h4>" + loc + "</h4>";
-				$(container).find("Item[xsi\\:type='Object']").each(function() {
-					var o = Object.assign({}, blank_item);
-					o.name = $(this).find('name').html();
-					o.price = Number($(this).find('price').text());
-					o.id = Number($(this).find('parentSheetIndex').text());
-					o.real_cat = Number($(this).find('category').text());
-					if (cat_translate.hasOwnProperty(o.real_cat)) { o.fair_cat = cat_translate[o.real_cat]; }
-					o.qual = Number($(this).find('quality').text());
-					o.stack = Number($(this).find('Stack').text());
-					o.loc = loc;
-					o.pts = calculateItemScore(o);
-					sortItem(o, max_cat, extra);
-					out += printObject(o);
-				});			
-				
+				$(container).find("Item[xsi\\:type='Object']").each(parseObject);
 			}
 		});
 
-		// Now we choose the best object combination. Logic is adding 5 bonus pts to the highest 6 category maxima
+		// Now we choose the best object combination by adding 5 bonus pts to the highest 6 category maxima
 		// and then merging with the extras to pick the best 9 items overall.
 		max_cat.sort(byPoints);
 		for (i = 0; i < 6; i++) {
@@ -278,13 +299,12 @@ window.onload = function () {
 		extra.sort(byPoints);
 		for (i = 0; i < 9; i++) {
 			$('#item_' + (i+1) + '_qual').val(extra[i].qual).trigger('change.select2');
-			$('#item_' + (i+1) + '_name').val(extra[i].id).trigger('change');
+			$('#item_' + (i+1) + '_name').val(extra[i].id).trigger('change.select2');
 			$('#item_' + (i+1) + '_pts').val(((extra[i].sort_bonus) ? extra[i].pts - 5 : extra[i].pts) + " pts");
 			$('#item_' + (i+1) + '_cat').val(cat_name[extra[i].fair_cat]);
-			$('#item_' + (i+1) + '_loc').val(extra[i].loc);
+			$('#item_' + (i+1) + '_loc').val(htmlDecode(extra[i].loc));
 		}
-		// For some reason, a manual call to calculateScore() doesn't draw the output table on my testing platform, and I don't know why
-		calculateScore();
+		calculateScore(false);
 
 		//$("#debug").html(out);
 	}
@@ -308,12 +328,10 @@ window.onload = function () {
 			}
 		};
 		reader.onload = function (e) {
-			var output = "",
-				xmlDoc = $.parseXML(e.target.result);
+			var xmlDoc = $.parseXML(e.target.result);
 
 			parseFile(xmlDoc);
 			prog.value = 100;
-			document.getElementById('out').innerHTML = output;
 			$('#output-container').show();
 			$('#progress-container').hide();
 		};
@@ -333,6 +351,7 @@ window.onload = function () {
 	}
 	
 	function adjustPrice(id, basePrice, category, quality) {
+		// Price adjustments from StardewValley.Object.sellToStorePrice()
 		var multiplier = 1.0,
 			price = Math.floor(basePrice * (1 + quality*0.25));
 			id = Number(id);
@@ -386,7 +405,27 @@ window.onload = function () {
 	function refreshPerks(evt) {
 		var t = evt.target;
 		perk[$(t).val()] = $(t).prop('checked');
-		calculateScore();
+		// Enforcing prereqs
+		if ($(t).val() === 'Fisher' && $(t).prop('checked') === false) {
+			$('input[name="perk_8"]').prop('checked', false);
+			perk["Angler"] = false;
+		} else if ($(t).val() === 'Angler' && $(t).prop('checked') === true) {
+			$('input[name="perk_6"]').prop('checked', true);
+			perk["Fisher"] = true;
+		} else if  ($(t).val() === 'Forester' && $(t).prop('checked') === false) {
+			$('input[name="perk_15"]').prop('checked', false);
+			perk["Tapper"] = false;
+		} else if  ($(t).val() === 'Tapper' && $(t).prop('checked') === true) {
+			$('input[name="perk_12"]').prop('checked', true);
+			perk["Forester"] = true;
+		} else if  ($(t).val() === 'Tiller' && $(t).prop('checked') === false) {
+			$('input[name="perk_4"]').prop('checked', false);
+			perk["Artisan"] = false;
+		} else if  ($(t).val() === 'Artisan' && $(t).prop('checked') === true) {
+			$('input[name="perk_1"]').prop('checked', true);
+			perk["Tiller"] = true;
+		} 
+		calculateScore(true);
 	}
 
 	function changeProfitMargin(evt) {
@@ -399,7 +438,7 @@ window.onload = function () {
 		}
 		perk.DifficultyModifier = n;
 		$(t).val(n.toFixed(2));
-		calculateScore();
+		calculateScore(true);
 	}
 
 	function refreshItem(evt) {
@@ -426,12 +465,11 @@ window.onload = function () {
 				$("#item_" + n[1] + "_loc").val("(Manual item selection)");
 			}
 		}
-		calculateScore();
+		calculateScore(false);
 	}
 
 	function calculateItemScore(o) {
 		// Primary logic from StardewValley.Event.lewisDoneJudgingGrange()
-		// Price adjustments from StardewValley.Object.sellToStorePrice()
 		var this_score = o.qual + 1,
 			price = adjustPrice(o.id, o.price, o.real_cat, o.qual);
 		if (price >= 20) { this_score++; }
@@ -442,7 +480,7 @@ window.onload = function () {
 		return this_score;
 	}
 	
-	function calculateScore() {
+	function calculateScore(forceItemScores) {
 		var summary,
 			score = 14,
 			blanks = 0,
@@ -456,23 +494,29 @@ window.onload = function () {
 			var this_score = 0,
 				qual = Number($("#item_"+i+"_qual").val()),
 				sid = $("#item_"+i+"_name").val(),
-				cat = 8;
+				cat = 8,
+				price = 0,
+				real_cat = 0;
 			if (sid === 'none') {
 				blanks++;
 				output += '<tr><td>' + 'Item ' + i + '</td><td> (No Item) </td><td>0</td></tr>';
 			} else {
 				if (obj_info.hasOwnProperty(sid)) {
 					cat = obj_info[sid].fair_cat;
+					price = obj_info[sid].price;
+					real_cat = obj_info[sid].real_cat;
 				}
 				if (cat !== 8) {
 					cat_seen[cat] = 1;
+				}
+				if (forceItemScores) {
+					$("#item_"+i+"_pts").val(calculateItemScore({ 'id': sid, 'price': price, 'real_cat': real_cat, 'qual': qual }) + " pts");
 				}
 				var re = /^(\d+) /,
 					n = re.exec($("#item_"+i+"_pts").val());
 				if (typeof(n) !== "undefined") {
 					this_score = Number(n[1]);
 				}
-
 				output += '<tr><td>' + 'Item ' + i + '</td><td>' + wikify(obj_info[sid].name) + ' (' + qual_name[qual] + ')' + '</td><td>' + this_score + '</td></tr>';
 				score += this_score;
 			}
@@ -506,9 +550,8 @@ window.onload = function () {
 		}
 		summary += "</p>";
 		
-		$("#out").html(summary);
-		$("#out").append(output);
-		$("#output-container").show();
+		$("#score_summary").html(summary);
+		$("#score_summary").append(output).show();
 	}
 	
 	$( document ).ready(function() {
