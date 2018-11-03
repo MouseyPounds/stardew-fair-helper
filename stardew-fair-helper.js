@@ -259,7 +259,12 @@ window.onload = function () {
 				} else {
 					name = $(container).find("name").html();
 					if (name !== "Chest") {
-						// Named chest, probably from Chests Anywhere mod. Remove special tokens
+						// Named chest, probably from a mod
+						// Ignore if a CFR machine
+						if (name.match(/^PyTK\|Item\|CustomFarmingRedux/)) {
+							return true;
+						}
+						// Remove Chests Anywhere special flags
 						name = name.replace(/\s+\|.+\|/,'');
 						name = "Chest (" + name + ")";
 					}
@@ -294,7 +299,7 @@ window.onload = function () {
 		}
 		calculateScore(false);
 
-		//$("#debug").html(out);
+		$("#debug").html(out);
 	}
 
 	function handleFileSelect(evt) {
