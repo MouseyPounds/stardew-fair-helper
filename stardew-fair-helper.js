@@ -299,7 +299,7 @@ window.onload = function () {
 		}
 		calculateScore(false);
 
-		$("#debug").html(out);
+		//$("#debug").html(out);
 	}
 
 	function handleFileSelect(evt) {
