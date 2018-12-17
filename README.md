@@ -8,4 +8,5 @@ The app is written in Javascript and uses [jQuery](https://jquery.com/) and [Sel
 
 ## Changelog
 
+* 15 Dec  2018 - v1.0.1 - Handling mod items a bit better
 *  2 Nov  2018 - v1.0.0 - Initial release

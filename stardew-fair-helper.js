@@ -86,7 +86,7 @@ window.onload = function () {
 			extra = [],
 			container,
 			loc,
-			blank_item = { id:'none', name:'(No Item)', price:0, qual:0, stack: 0, pts: 0,
+			blank_item = { id:'none', name:'(No Item)', dname:'', price:0, qual:0, stack: 0, pts: 0,
 							fair_cat:8, real_cat:0, sort_bonus:false, loc:'(Location info if analyzing a save)' },
 			cat_translate = { "-18": 0, "-14": 0, "-6": 0, "-5": 0, "-26": 1, "-7": 2, "-4": 3,
 							  "-81": 4, "-80": 4, "-27": 4, "-79": 5, "-12": 6, "-2": 6, "-75": 7 },
@@ -157,6 +157,7 @@ window.onload = function () {
 			// the .each() handler
 			var o = Object.assign({}, blank_item);
 			o.name = $(e).find('name').html();
+			o.dname = $(e).find('DisplayName').html();
 			o.price = Number($(e).find('price').text());
 			o.id = Number($(e).find('parentSheetIndex').text());
 			o.real_cat = Number($(e).find('category').text());
@@ -293,13 +294,22 @@ window.onload = function () {
 		for (i = 0; i < 9; i++) {
 			$('#item_' + (i+1) + '_qual').val(extra[i].qual).trigger('change.select2');
 			$('#item_' + (i+1) + '_name').val(extra[i].id).trigger('change.select2');
+			$('#item_' + (i+1) + '_dname').val(extra[i].dname);
 			$('#item_' + (i+1) + '_pts').val(((extra[i].sort_bonus) ? extra[i].pts - 5 : extra[i].pts) + " pts");
 			$('#item_' + (i+1) + '_cat').val(cat_name[extra[i].fair_cat]);
 			$('#item_' + (i+1) + '_loc').val(htmlDecode(extra[i].loc));
 		}
 		calculateScore(false);
 
-		//$("#debug").html(out);
+		// Debug Output
+		/*
+		out += "<h4>Final Array</h4><ol>";
+		for (i = 0; i < extra.length; i++) {
+			out += "<li> Quality:" + extra[i].qual + " ID:" + extra[i].id + " pts:" + extra[i].pts + " bonus:" + extra[i].sort_bonus + " cat:" + cat_name[extra[i].fair_cat] + " (" + extra[i].fair_cat + ") loc:" + htmlDecode(extra[i].loc) + "</li>";
+		}
+		out += "</ol>";
+		$("#debug").html(out);
+		// */
 	}
 
 	function handleFileSelect(evt) {
@@ -487,6 +497,7 @@ window.onload = function () {
 			var this_score = 0,
 				qual = Number($("#item_"+i+"_qual").val()),
 				sid = $("#item_"+i+"_name").val(),
+				dname = "Unknown mod item",
 				cat = 8,
 				price = 0,
 				real_cat = 0;
@@ -498,6 +509,18 @@ window.onload = function () {
 					cat = obj_info[sid].fair_cat;
 					price = obj_info[sid].price;
 					real_cat = obj_info[sid].real_cat;
+					dname = wikify(obj_info[sid].name);
+				} else {
+					if ($("#item_"+i+"_dname").val() !== '') {
+						dname = $("#item_"+i+"_dname").val();
+					}
+					// Determining category for mod items since they are not in obj_info
+					for (var j=0; j < 9; j++) {
+						if ($("#item_"+i+"_cat").val() === cat_name[j]) {
+							cat = j;
+							break;
+						}
+					}
 				}
 				if (cat !== 8) {
 					cat_seen[cat] = 1;
@@ -510,7 +533,7 @@ window.onload = function () {
 				if (typeof(n) !== "undefined") {
 					this_score = Number(n[1]);
 				}
-				output += '<tr><td>' + 'Item ' + i + '</td><td>' + wikify(obj_info[sid].name) + ' (' + qual_name[qual] + ')' + '</td><td>' + this_score + '</td></tr>';
+				output += '<tr><td>' + 'Item ' + i + '</td><td>' + dname + ' (' + qual_name[qual] + ')' + '</td><td>' + this_score + '</td></tr>';
 				score += this_score;
 			}
 			
@@ -555,6 +578,7 @@ window.onload = function () {
 			var stuff = '<fieldset id="item_' + i + 'set"><legend>Item ' + i + '</legend>';
 			stuff += '<select class="quality" id="item_' + i + '_qual"></select>';
 			stuff += ' <select class="item" id="item_' + i + '_name"></select>';
+			stuff += ' <input type="hidden" class="category" id="item_' + i + '_dname" value="">';
 			stuff += ' <input type="text" class="category" id="item_' + i + '_cat" value="(No Category)">';
 			stuff += ' <input type="text" class="item_pts" id="item_' + i + '_pts" value="0 pts">';
 			stuff += ' <input type="text" class="location" id="item_' + i + '_loc" value="(Location info if analyzing a save)"></fieldset>';
