@@ -8,5 +8,6 @@ The app is written in Javascript and uses [jQuery](https://jquery.com/) and [Sel
 
 ## Changelog
 
+* 30 Jan  2019 - v1.1   - Improved support for iOS save files
 * 15 Dec  2018 - v1.0.1 - Handling mod items a bit better
-*  2 Nov  2018 - v1.0.0 - Initial release
+*  2 Nov  2018 - v1.0   - Initial release

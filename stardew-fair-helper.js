@@ -117,7 +117,8 @@ window.onload = function () {
 				4294901502: "White",
 				},
 			i,
-			n;
+			n,
+			ns_prefix = ($(xmlDoc).find('SaveGame[xmlns\\:xsi]').length > 0) ? 'xsi': 'p3';;
 
 		// Debug output; delete later
 		var out = "<h3>Debug Output</h3>";		
@@ -221,7 +222,7 @@ window.onload = function () {
 		container = $(xmlDoc).find('player');
 		loc = $(container).find('name').html() + "'s Inventory";
 		out += "<h4>" + loc + "</h4>";
-		$(container).find("Item[xsi\\:type='Object']").each(parseObject);
+		$(container).find("Item[" + ns_prefix + "\\:type='Object']").each(parseObject);
 		
 		// Farmhand inventories
 		$(xmlDoc).find('farmhand').each(function() {
@@ -229,7 +230,7 @@ window.onload = function () {
 				container = this;
 				loc = $(container).find('name').html() + "'s Inventory";
 				out += "<h4>" + loc + "</h4>";
-				$(container).find("Item[xsi\\:type='Object']").each(parseObject);	
+				$(container).find("Item[" + ns_prefix + "\\:type='Object']").each(parseObject);	
 			}
 		});
 		
@@ -276,7 +277,7 @@ window.onload = function () {
 				}
 				loc = name + bldgName + locName;
 				out += "<h4>" + loc + "</h4>";
-				$(container).find("Item[xsi\\:type='Object']").each(parseObject);
+				$(container).find("Item[" + ns_prefix + "\\:type='Object']").each(parseObject);
 			}
 		});
 
