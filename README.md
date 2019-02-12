@@ -8,6 +8,7 @@ The app is written in Javascript and uses [jQuery](https://jquery.com/) and [Sel
 
 ## Changelog
 
+* 12 Feb  2019 - v1.1.1 - Fixed error parsing difficulty modifier
 * 30 Jan  2019 - v1.1   - Improved support for iOS save files
 * 15 Dec  2018 - v1.0.1 - Handling mod items a bit better
 *  2 Nov  2018 - v1.0   - Initial release

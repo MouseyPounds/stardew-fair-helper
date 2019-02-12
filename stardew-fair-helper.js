@@ -184,7 +184,7 @@ window.onload = function () {
 		$('input.perk').prop('checked', false);
 			
 		// Now set perks based on save; all farmhands are counted
-		n = Number($(xmlDoc).find('difficultyModifier').text());
+		n = Number($(xmlDoc).find('player > difficultyModifier').first().text());
 		if (typeof(n) === 'undefined' || n === 0) {
 			n = 1;
 		}
