@@ -133,19 +133,36 @@ window.onload = function () {
 			// Item sorting looks to replace the max for this category first
 			// Then merges the loser of that comparison into the extras
 			var loser = Object.assign({}, o);
+			var stack_count = 0;
 			if (o.fair_cat !== 8) {
 				if (o.pts > max_cat[o.fair_cat].pts) {
 					loser = Object.assign({}, max_cat[o.fair_cat]);
 					Object.assign(max_cat[o.fair_cat], o);
-				} else {
+					// If this item was part of a stack, remaining copies should be added to extras
+					stack_count = o.stack - 1;
+					if (stack_count > 0) {
+						for (var j = 0; j < 9; j++) {
+							if (o.pts > extra[j].pts) {
+								extra.splice(j, 0, o);
+								extra.pop();
+								if (stack_count > 1) {
+									stack_count--;
+									continue;
+								} else {
+									break;
+								}
+							}
+						}
+					}
 				}
 			}
+			stack_count = loser.stack;
 			for (var j = 0; j < 9; j++) {
 				if (loser.pts > extra[j].pts) {
 					extra.splice(j, 0, loser);
 					extra.pop();
-					if (loser.stack > 1) {
-						loser.stack--;
+					if (stack_count > 1) {
+						stack_count--;
 						continue;
 					} else {
 						break;
