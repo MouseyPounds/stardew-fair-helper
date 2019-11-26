@@ -8,6 +8,7 @@ The app is written in Javascript and uses [jQuery](https://jquery.com/) and [Sel
 
 ## Changelog
 
+* 26 Nov  2019 - v2.0   - Support for Stardew Valley 1.4
 * 12 June 2019 - v1.1.2 - Fixed error with some item stacks being ignored
 * 12 Feb  2019 - v1.1.1 - Fixed error parsing difficulty modifier
 * 30 Jan  2019 - v1.1   - Improved support for iOS save files
