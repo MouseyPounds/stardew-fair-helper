@@ -19,7 +19,7 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 <script>window.jQuery || document.write('<script src="./jquery-3.2.1.min.js"><\/script>')</script>
 <script src="./select2.min.js"></script>
-<script src="./stardew-fair-helper.js?v=2.0"></script>
+<script src="./stardew-fair-helper.js?v=3.0"></script>
 
 </head>
 <body>
@@ -29,14 +29,14 @@
 <p>This app helps to prepare for the Grange Display at the Fall Festival in <a href="http://stardewvalley.net/">Stardew Valley</a>. It will calculate the score for manually-entered items and also search through a save file to recommend which item combination would give the highest possible score. 
 Stored items from mods will be checked and included when analyzing a save, but will generally not be selectable in the menus. All new items from version 1.4 should be supported and included in the menus. <span class="strong note">Note this means using this app could spoil some of the new content.</span>
 </p>
-<p>The app is written in Javascript and uses <a href="https://jquery.com/">jQuery</a> and <a href="https://select2.org/">Select2</a>; it is hosted on GitHub Pages at <a href="https://mouseypounds.github.io/stardew-fair-helper/">https://mouseypounds.github.io/stardew-fair-helper/</a> and the source code repository is <a href="https://github.com/MouseyPounds/stardew-fair-helper">https://github.com/MouseyPounds/stardew-fair-helper</a>. Please report any bugs, suggestions, or other feedback to <a href="https://community.playstarbound.com/threads/webapp-stardew-fair-helper-make-the-best-grange-display.149849/">the topic in the official forums</a>.</p>
+<p>The app is written in Javascript and uses <a href="https://jquery.com/">jQuery</a> and <a href="https://select2.org/">Select2</a>; it is hosted on GitHub Pages at <a href="https://mouseypounds.github.io/stardew-fair-helper/">https://mouseypounds.github.io/stardew-fair-helper/</a> and the source code repository is <a href="https://github.com/MouseyPounds/stardew-fair-helper">https://github.com/MouseyPounds/stardew-fair-helper</a>. Please report any bugs, suggestions, or other feedback to <a href="https://community.playstarbound.com/threads/webapp-stardew-fair-helper-make-the-best-grange-display.149849/">the topic in the Chucklefish forums</a>.</p>
 </div>
 
 <div id="input-container" class="panel">
 <h2 id="sec_save_file">Save File</h2>
 <p>If you would like the app to scan a save file in order to recommend what items to use for the display, you can select the save file below: <br />
 <input type="file" id="file_select" /></p>
-<p>Please use the full save file named with your farmer's name and a 9-digit ID number (e.g. <span class="path">Fred_148093307</span>); do not use the <span class="path">SaveGameInfo</span> file as it does not contain all the necessary information.
+<p>Please use the full save file named with your farmer's name (or farm name) and an ID number (e.g. <span class="path">Fred_148093307</span>); do not use the <span class="path">SaveGameInfo</span> file as it does not contain all the necessary information.
 <p>Default save file locations are:
 <ul><li>Windows: <span class="path">%AppData%\StardewValley\Saves\</span></li>
 <li>Mac OSX &amp; Linux: <span class="path">~/.config/StardewValley/Saves/</span></li>
@@ -106,6 +106,7 @@ since that item causes <a href="https://stardewvalleywiki.com/Stardew_Valley_Fai
 <noscript><span class="error">Javascript appears to be unsupported by or disabled in your browser. Stardew Fair Helper will not work without it.</span></noscript>
 <h2 id="sec_changelog">Changelog</h2>
 <ul>
+<li>28 Dec  2020 - v3.0   - Support for Stardew Valley 1.5</li>
 <li>24 Jul  2020 - v2.0.1 - Updated forum link in footer</li>
 <li>26 Nov  2019 - v2.0   - Support for Stardew Valley 1.4</li>
 <li>12 June 2019 - v1.1.2 - Fixed error with some item stacks being ignored</li>
